@@ -1,3 +1,3 @@
 # random-world-cli
-Bulk generate flat files of "real" data (CSV, JSON, text files) using the random-world library.
+Quickly generate large flat files of "real looking" data (CSV, JSON, unstructured text files) using the random-world library.
  
