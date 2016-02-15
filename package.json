@@ -1,0 +1,25 @@
+{
+  "name": "random-world-cli",
+  "version": "1.0.0",
+  "description": "Command line tools to generate bulk files containing mocked data from the random-world library. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drb/random-world-cli.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drb/random-world-cli/issues"
+  },
+  "homepage": "https://github.com/drb/random-world-cli#readme",
+  "dependencies": {
+    "bluebird": "^3.3.1",
+    "commander": "^2.9.0",
+    "progress": "^1.1.8",
+    "random-world": "^1.1.3"
+  }
+}
