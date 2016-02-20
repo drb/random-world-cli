@@ -78,6 +78,10 @@ var // internal packages
          */
         fileStream: function (file) {
 
+            if (!file) {
+                return process.stdout;
+            }
+
             return fs.createWriteStream(path.resolve(__dirname, file));
         },
 
@@ -115,20 +119,20 @@ return Promise
     .then(function () {
 
         program
-          .version(pkg.version)
-          .option('-f, --format [format]',      'Output format [stdout|csv|text]. Defaults to stdout.', /^(stdout|csv|text|sql)$/i, 'stdout')
-          .option('-s, --size [size]',          'Target output size.')
-          .option('-o, --output [output]',      'Target file.')
-          .option('-h, --headers [headers]',    'Optional headers for CSV output.')
-          .option('-c, --columns [columns]',    'Required column names for SQL bulk insert scripts')
-          .option('-t, --table [table]',        'Required table names for SQL bulk insert scripts')
-          .option('-r, --rows [rows]',          'Number of rows to generate.', parseInt);
+            .version(pkg.version)
+            .option('-f, --format [format]',      'Output format [stdout|csv|text]. Defaults to stdout.', /^(stdout|csv|text|sql)$/i, 'stdout')
+            .option('-s, --size [size]',          'Target output size.')
+            .option('-o, --output [output]',      'Target file.')
+            .option('-h, --headers [headers]',    'Optional headers for CSV output.')
+            .option('-c, --columns [columns]',    'Required column names for SQL bulk insert scripts')
+            .option('-t, --table [table]',        'Required table names for SQL bulk insert scripts')
+            .option('-r, --rows [rows]',          'Number of rows to generate.', parseInt);
 
         program.on('--help', function() {
-          console.log('  Examples:');
-          console.log('');
-          console.log('    $ random-world-cli --help');
-          console.log('');
+            console.log('  Examples:');
+            console.log('');
+            console.log('    $ random-world-cli --help');
+            console.log('');
         });
 
         program.parse(process.argv);
@@ -146,14 +150,23 @@ return Promise
                 case 'text':
                 case 'sql':
 
-                    if (!program.output) {
-                        return reject(util.format('Output file must be provided when using %s on --format flag', program.format));
-                    }
+                    // if (!program.output) {
+                    //     return reject(util.format('Output file must be provided when using %s on --format flag', program.format));
+                    // }
 
                     if (program.format === 'sql') {
+
                         if (!program.columns) {
+                            // no columns supplied
                             return reject(util.format('Columns must be provided when using SQL flag. Use the --columns flag.'));
+                        } else {
+
+                            // check columns map to args
+                            if (program.columns.toString().split(',').length != program.args.length) {
+                                return reject(util.format('Column count does not match argument count.'));
+                            }
                         }
+
                         if (!program.table) {
                             return reject(util.format('Table name must be provided when using SQL flag. Use the --table flag.'));
                         }
@@ -348,13 +361,13 @@ return Promise
             }
 
             // show progress if not in stdout mode
-            if (bar) {
+            if (bar  && program.output) {
                 bar.tick();
             }
         }
 
         // close stream
-        if (program.format !== 'stdout') {
+        if (program.format !== 'stdout' && program.output) {
             stream.end();
         }
     })
@@ -369,7 +382,7 @@ return Promise
 
         var finished = new Date().getTime();
 
-        if (program.format !== 'stdout') {
+        if (program.format !== 'stdout' && program.output) {
             console.log("Finished in %sms", (finished - startTime));
         }
     });
