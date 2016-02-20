@@ -18,7 +18,7 @@ All documentation for the methods exposed by the `random-world` library can be f
 
 Arguments that create random-goodness are passed to the program using `namespace`.`method` syntax e.g.
 
-`random-world-cli names.title, names.fullname -r 5`
+`random-world-cli names.title, names.fullname, places.city -r 5`
 
 This will output 5 rows (`-r 5`) consisting of a person's title (`names.title`), their full name (`names.fullname`) and a city (`places.city`):
 
