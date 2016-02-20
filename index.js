@@ -16,13 +16,13 @@ var // internal packages
     util    = require('util'),
     fs      = require('fs'),
 
-    now     = new Date().getTime(),
-
     // external libs
     random      = require('random-world'),
     program     = require('commander'),
     ProgressBar = require('progress'),
     Promise     = require('bluebird'),
+
+    startTime   = new Date().getTime(),
 
     // various utilities
     utils = {
@@ -79,6 +79,25 @@ var // internal packages
         fileStream: function (file) {
 
             return fs.createWriteStream(path.resolve(__dirname, file));
+        },
+
+        /**
+         * [generateTokens description]
+         *
+         * @return {[type]} [description]
+         */
+        generateTokens: function (tokens) {
+
+            var placeholders = [],
+                token = '%s',
+                counter = 0;
+
+            while (counter < tokens) {
+                placeholders[counter] = token;
+                counter++;
+            }
+
+            return placeholders.join(', ');
         }
     };
 
@@ -102,6 +121,7 @@ return Promise
           .option('-o, --output [output]',      'Target file.')
           .option('-h, --headers [headers]',    'Optional headers for CSV output.')
           .option('-c, --columns [columns]',    'Required column names for SQL bulk insert scripts')
+          .option('-t, --table [table]',        'Required table names for SQL bulk insert scripts')
           .option('-r, --rows [rows]',          'Number of rows to generate.', parseInt);
 
         program.on('--help', function() {
@@ -128,6 +148,15 @@ return Promise
 
                     if (!program.output) {
                         return reject(util.format('Output file must be provided when using %s on --format flag', program.format));
+                    }
+
+                    if (program.format === 'sql') {
+                        if (!program.columns) {
+                            return reject(util.format('Columns must be provided when using SQL flag. Use the --columns flag.'));
+                        }
+                        if (!program.table) {
+                            return reject(util.format('Table name must be provided when using SQL flag. Use the --table flag.'));
+                        }
                     }
 
                     break;
@@ -172,7 +201,7 @@ return Promise
 
                 calls.push({
                     namespace:  parts[0],
-                    method:     parts[1],
+                    method:     parts[1] || false,
                     options:    methodArgs[i]
                 });
             });
@@ -231,7 +260,7 @@ return Promise
 
                 // stream is a write stream
                 stream  = utils.fileStream(program.output);
-                bar = new ProgressBar(util.format('Writing %s output [:bar] :percent :etas', program.format), { total: +program.rows });
+                bar     = new ProgressBar(util.format('Writing %s output [:bar] :percent :etas', program.format), { total: +program.rows });
 
                 break;
         }
@@ -250,7 +279,18 @@ return Promise
 
                 try {
 
-                    value = random[namespace][method](args || {});
+                    // try and pass the method call into random-world
+                    // if this throws an exception, we just write the value
+                    // from the CLI argument back into the document
+                    try {
+                        if (method !== false) {
+                            value = random[namespace][method](args || {});
+                        } else {
+                            value = namespace;
+                        }
+                    } catch (e) {
+                        value = [namespace, method].join('.');
+                    }
 
                     // if (value.indexOf(",") > -1) {
                     //     escaped = true;
@@ -273,6 +313,11 @@ return Promise
 
                         case 'sql':
 
+                            // only wrap values in quotes if strings
+                            if (!value.toString().match(/^[0-9]+$/)) {
+                                value = ['"', value, '"'].join('');
+                            }
+
                             // cache for later
                             values.push(value);
 
@@ -285,9 +330,14 @@ return Promise
 
             // sql format is a list of insert statements
             if (program.format === 'sql') {
+
+                var tokens = utils.generateTokens(payload.headers.length);
+
                 //
                 stream.write([
-                    util.format.apply(undefined, ["INSERT INTO tbl (%s, %s, %s) VALUES (%s, %s, %s)"].concat(payload.headers.concat(values))),
+                    util.format.apply(undefined, [
+                        util.format("INSERT INTO %s (%s) VALUES (%s)", program.table, tokens, tokens)
+                    ].concat(payload.headers.concat(values))),
                     ';'
                 ].join(''));
             }
@@ -314,9 +364,12 @@ return Promise
         console.error('[argument_parse_error] %s', e);
     })
 
-    .lastly(function(){
+    // output the time to completion
+    .lastly(function() {
 
         var finished = new Date().getTime();
 
-        console.log(finished - now);
+        if (program.format !== 'stdout') {
+            console.log("Finished in %sms", (finished - startTime));
+        }
     });
