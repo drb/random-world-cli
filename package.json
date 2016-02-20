@@ -1,6 +1,6 @@
 {
   "name": "random-world-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Command line tools to generate bulk files containing mocked data from the random-world library. ",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,7 @@
   "keywords": [
     "random",
     "data",
-    "csv"
+    "csv",
+    "random SQL generator"
   ]
 }
