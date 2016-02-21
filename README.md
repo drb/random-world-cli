@@ -87,14 +87,14 @@ When the `--headers` flag is provided, the number of arguments provided must mat
 
 Bulk insert statements can also be generated for importing dummy data into SQL tables. When the `-f --format` flag is set to `sql`, the `-t --table` and `-c --columns` parameters must be provided. The columns provided must have the same count as the number of arguments the program will generate, otherwise an error will be raised.
 
-`random-world-cli names.fullname, 'numbers.integer[max: 100]', 'places.address', 'places.city' -r 200 -f sql --columns "ip, domain, fullName, age" --table tbl_People`
+`random-world-cli names.fullname, 'numbers.integer[max: 100]', places.street, places.city -r 5 -f sql --columns "name, age, address, city" --table tbl_People`
 
 ```
-INSERT INTO tbl_People (name, age, address, city) VALUES ("Jerold Schwartz", 99, "69 Eat Avenue", "Port-aux-Francais");
-INSERT INTO tbl_People (name, age, address, city) VALUES ("Leeann Padgett", 38, "147 Doctor Quay", "Piaski");
-INSERT INTO tbl_People (name, age, address, city) VALUES ("Lorie Vest", 22, "133 Fine Mews", "Cotonou");
-INSERT INTO tbl_People (name, age, address, city) VALUES ("Stephania Evans", 27, "123 With Crescent", "Koper");
-INSERT INTO tbl_People (name, age, address, city) VALUES ("Tawna Ho", 2, "60 Slow Mews", "Gaborone");
+INSERT INTO tbl_People (name, age, street, city) VALUES ("Jerold Schwartz", 99, "69 Eat Avenue", "Port-aux-Francais");
+INSERT INTO tbl_People (name, age, street, city) VALUES ("Leeann Padgett", 38, "147 Doctor Quay", "Piaski");
+INSERT INTO tbl_People (name, age, street, city) VALUES ("Lorie Vest", 22, "133 Fine Mews", "Cotonou");
+INSERT INTO tbl_People (name, age, street, city) VALUES ("Stephania Evans", 27, "123 With Crescent", "Koper");
+INSERT INTO tbl_People (name, age, street, city) VALUES ("Tawna Ho", 2, "60 Slow Mews", "Gaborone");
 ```
 **Types - stdout**
 
