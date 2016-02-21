@@ -126,6 +126,7 @@ return Promise
             .option('-h, --headers [headers]',    'Optional headers for CSV output.')
             .option('-c, --columns [columns]',    'Required column names for SQL bulk insert scripts')
             .option('-t, --table [table]',        'Required table names for SQL bulk insert scripts')
+            .option('-d, --delimiter [delimiter]',        'Custom delimiter to split values with', /.*/, ', ')
             .option('-r, --rows [rows]',          'Number of rows to generate.', parseInt);
 
         program.on('--help', function() {
@@ -264,7 +265,7 @@ return Promise
                 bar     = new ProgressBar(util.format('Writing %s output [:bar] :percent :etas', program.format), { total: +program.rows });
 
                 if (payload.headers.length) {
-                    stream.write([payload.headers.join(", "), "\n"].join(''));
+                    stream.write([payload.headers.join(program.delimiter), "\n"].join(''));
                 }
 
                 break;
@@ -319,7 +320,7 @@ return Promise
                                 // (escaped ? '"' : ''),
                                 value,                                                  // call the method
                                 // (escaped ? '"' : ''),
-                                (payload.calls.length > 1 && (i != payload.calls.length-1) ? ', ': '')  // add comma on the end?
+                                (payload.calls.length > 1 && (i != payload.calls.length-1) ? program.delimiter: '')  // add comma on the end?
                             ].join(''));
 
                             break;
@@ -374,7 +375,7 @@ return Promise
 
     // catch any errors
     .catch (function (e) {
-        console.error('[argument_parse_error] %s', e);
+        console.error('[random-world-cli][error] %s', e);
     })
 
     // output the time to completion

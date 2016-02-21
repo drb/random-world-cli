@@ -61,7 +61,7 @@ This will output 5 rows comprising of a random number with a limit of 2000, and 
 
 Any arguments passed into the library that cannot be resolved as a random-world method will be output to the stream as-is. For example:
 
-`random-world-cli 'numbers.integer', 'some random value', places.city -r 5`
+`random-world-cli numbers.integer, 'some random value', places.city -r 5`
 
 Outputs a random number (`numbers.integer`), the unresolvable string `some random value`, and a random city name `places.city`.
 
@@ -73,8 +73,38 @@ Outputs a random number (`numbers.integer`), the unresolvable string `some rando
 5756085, some random value, Saipan
 ```
 
-**Documentation @TODOs**
+**Escaping/Value Wrapping**
 
-- SQL types
-- stdout piping
-- CSV headers
+The program will attempt to escape values according to the output type and the type of the value. For example, a SQL output will wrap strings in quotes and leave ints/longs as the native value.
+
+**Types - CSV**
+
+The most common use-case for this program was to generate CSVs. The `-f --format` flag must be set to `csv`. Optionally, the `-h --headers` flag can be provided that will append the column headers (names) to the start of the CSV. Headers must be wrapped in single quotes and split by commas.
+
+When the `--headers` flag is provided, the number of arguments provided must match the headers count.
+
+**Types - SQL**
+
+Bulk insert statements can also be generated for importing dummy data into SQL tables. When the `-f --format` flag is set to `sql`, the `-t --table` and `-c --columns` parameters must be provided. The columns provided must have the same count as the number of arguments the program will generate, otherwise an error will be raised.
+
+`random-world-cli names.fullname, 'numbers.integer[max: 100]', 'places.address', 'places.city' -r 200 -f sql --columns "ip, domain, fullName, age" --table tbl_People`
+
+```
+INSERT INTO tbl_People (name, age, address, city) VALUES ("Jerold Schwartz", 99, "69 Eat Avenue", "Port-aux-Francais");
+INSERT INTO tbl_People (name, age, address, city) VALUES ("Leeann Padgett", 38, "147 Doctor Quay", "Piaski");
+INSERT INTO tbl_People (name, age, address, city) VALUES ("Lorie Vest", 22, "133 Fine Mews", "Cotonou");
+INSERT INTO tbl_People (name, age, address, city) VALUES ("Stephania Evans", 27, "123 With Crescent", "Koper");
+INSERT INTO tbl_People (name, age, address, city) VALUES ("Tawna Ho", 2, "60 Slow Mews", "Gaborone");
+```
+**Types - stdout**
+
+If the `-o --output` flag is not set, the data will be piped straight to `stdout`. This is useful for testing before writing files, or using to pipe to another program. For example. this output of 1000 names can be easily passed to `grep`.
+
+`random-world-cli names.fullname -r 10000 | grep Dave`
+
+```
+Leon **Dave**nport
+**Dave** Mccain
+**Dave** **Dave**nport
+**Dave** Kovach
+```
