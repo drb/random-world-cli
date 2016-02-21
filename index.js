@@ -357,9 +357,9 @@ return Promise
             }
 
             // terminate the row with linebreak
-            if (k != (+program.rows - 1)) {
+            //if (k != (+program.rows - 1)) {
                 stream.write("\n");
-            }
+            //}
 
             // show progress if not in stdout mode
             if (bar  && program.output) {
