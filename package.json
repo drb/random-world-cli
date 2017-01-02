@@ -1,13 +1,13 @@
 {
   "name": "random-world-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Command line tools to generate bulk files containing mocked data from the random-world library. ",
-  "main": "index.js",
+  "main": "./bin/index.js",
   "scripts": {
     "test": "grunt"
   },
    "bin": {
-    "random-world-cli": "./index.js"
+    "random-world-cli": "./bin/index.js"
   },
   "repository": {
     "type": "git",
