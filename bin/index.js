@@ -7,7 +7,7 @@
  **/
 
 var // internal packages
-    pkg     = require('./package.json'),
+    pkg     = require('../package.json'),
     path    = require('path'),
     util    = require('util'),
     fs      = require('fs'),
