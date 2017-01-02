@@ -4,11 +4,7 @@
  * CLI interface for bulk generating files using the random-world library
  *
  * https://www.npmjs.com/package/random-world
- *
- *  node index.js network.url, places.city, names.fullname, network.ip, money.ccnumber -r 6500 --output myOutput.csv -f csv --headers "Domain Name, City, Name, IP, Creditcard Number"
- *  node index.js names.fullname, places.street, places.city, places.country, money.ccnumber, money.cctype, money.expiry, money.ccstart, money.cv2 -r 6500 --output myOutput.csv -f csv --headers "Full Name, Address Line 1, City, Country, Credit Card Number, Type, Expires, Starts, CVV"
- *  args 'network.ip[foo:fgop, arse:1]', network.domain -r 2
- */
+ **/
 
 var // internal packages
     pkg     = require('./package.json'),
@@ -22,6 +18,7 @@ var // internal packages
     ProgressBar = require('progress'),
     Promise     = require('bluebird'),
 
+    // used for calculating the execution time
     startTime   = new Date().getTime(),
 
     // various utilities
@@ -120,14 +117,16 @@ return Promise
 
         program
             .version(pkg.version)
-            .option('-f, --format [format]',      'Output format [stdout|csv|text]. Defaults to stdout.', /^(stdout|csv|text|sql)$/i, 'stdout')
-            .option('-s, --size [size]',          'Target output size.')
-            .option('-o, --output [output]',      'Target file.')
-            .option('-h, --headers [headers]',    'Optional headers for CSV output.')
-            .option('-c, --columns [columns]',    'Required column names for SQL bulk insert scripts')
-            .option('-t, --table [table]',        'Required table names for SQL bulk insert scripts')
-            .option('-d, --delimiter [delimiter]',        'Custom delimiter to split values with', /.*/, ', ')
-            .option('-r, --rows [rows]',          'Number of rows to generate.', parseInt);
+            .option('-f, --format [format]',        'Output format [stdout|csv|text]. Defaults to stdout.', /^(stdout|csv|text|sql)$/i, 'stdout')
+            .option('-s, --size [size]',            'Target output size.')
+            .option('-o, --output [output]',        'Target file.')
+            .option('-h, --headers [headers]',      'Optional headers for CSV output.')
+            .option('-c, --columns [columns]',      'Required column names for SQL bulk insert scripts')
+            .option('-t, --table [table]',          'Required table names for SQL bulk insert scripts')
+            .option('-u, --uniq --unique [unique]', 'Ensure that all rows are unique (no duplicates) - will raise an error if the row count exceeds the maximum permutations for the selected columns')
+            .option('-d, --delimiter [delimiter]',  'Custom delimiter to split values with', /.*/, ', ')
+            .option('--dbhint [dbhint]',            'Database hint - when mysql, outputs the bulk statements using a multi-value staement', /(mysql|mssql|postgres)/, false)
+            .option('-r, --rows [rows]',            'Number of rows to generate.', parseInt);
 
         program.on('--help', function() {
             console.log('  Examples:');
