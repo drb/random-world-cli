@@ -1,4 +1,4 @@
-/*jslint node: true, loopfunc: true */
+#!/usr/bin/env node
 
 /**
  * CLI interface for bulk generating files using the random-world library
@@ -47,7 +47,7 @@ var // internal packages
 
             // write the parsed value to the args object - we try and do some
             // arbitrary type conversion too
-            args.forEach(function(arg) {
+            (args || []).forEach(function(arg) {
 
                 var val = arg[1].trim();
 
@@ -190,6 +190,10 @@ return Promise
                 methodArgs  = [],
                 calls       = [],
                 headers     = [];
+
+            if (!matches) {
+                return reject("No fields were specified.");
+            }
 
             matches.forEach(function(match) {
 
